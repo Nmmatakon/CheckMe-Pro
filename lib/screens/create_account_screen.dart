@@ -23,7 +23,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     final mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
-      appBar: customAppBar(null),
+      appBar: customAppBar(null, context),
       body: SizedBox(
         height: double.infinity,
         width: double.infinity,

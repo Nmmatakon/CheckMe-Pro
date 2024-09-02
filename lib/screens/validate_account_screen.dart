@@ -52,7 +52,7 @@ class ValidateAccountScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: customAppBar(null),
+      appBar: customAppBar(null, context),
       body: SizedBox(
         height: double.infinity,
         width: double.infinity,

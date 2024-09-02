@@ -18,7 +18,7 @@ class HomepageScreen extends StatelessWidget {
     var fingerprintAuth = FingerprintAuth();
 
     return Scaffold(
-      appBar: customAppBar('CheckME'),
+      appBar: customAppBar('CheckME', context),
       body: SizedBox(
         width: double.infinity,
         child: Column(
