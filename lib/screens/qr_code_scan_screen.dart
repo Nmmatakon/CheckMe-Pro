@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:checkme_pro/providers/session_provider.dart';
+import 'package:checkme_pro/screens/homepage_screen.dart';
 import 'package:checkme_pro/widgets/scan_error_widget.dart';
 import 'package:checkme_pro/widgets/sccanner_buttons_widget.dart';
 import 'package:flutter/material.dart';
@@ -19,9 +21,11 @@ class _QrCodeScanScreenState extends State<QrCodeScanScreen>
     torchEnabled: false,
     useNewCameraSelector: true,
   );
+  SessionProvider sessionProvider = SessionProvider();
 
   Barcode? _barcode;
   StreamSubscription<Object?>? _subscription;
+  String userMatricule = "m1";
 
   Widget _buildBarcode(Barcode? value) {
     if (value == null) {
@@ -32,6 +36,14 @@ class _QrCodeScanScreenState extends State<QrCodeScanScreen>
       );
     }
     print(value.displayValue);
+    if (userMatricule == value.displayValue) {
+      print("success");
+      sessionProvider.answer_call_session(matricule: userMatricule);
+      // Navigator.of(context).pushReplacementNamed(HomepageScreen.routeName);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed(HomepageScreen.routeName);
+      });
+    }
     return const Text(
       // value.displayValue ?? 'No display value.',
       "Scan performs",
@@ -81,6 +93,15 @@ class _QrCodeScanScreenState extends State<QrCodeScanScreen>
   }
 
   @override
+  Future<void> dispose() async {
+    WidgetsBinding.instance.removeObserver(this);
+    unawaited(_subscription?.cancel());
+    _subscription = null;
+    super.dispose();
+    await controller.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('CheckMe Scanner')),
@@ -115,14 +136,5 @@ class _QrCodeScanScreenState extends State<QrCodeScanScreen>
         ],
       ),
     );
-  }
-
-  @override
-  Future<void> dispose() async {
-    WidgetsBinding.instance.removeObserver(this);
-    unawaited(_subscription?.cancel());
-    _subscription = null;
-    super.dispose();
-    await controller.dispose();
   }
 }
