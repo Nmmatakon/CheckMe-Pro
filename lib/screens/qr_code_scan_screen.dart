@@ -25,7 +25,7 @@ class _QrCodeScanScreenState extends State<QrCodeScanScreen>
 
   Barcode? _barcode;
   StreamSubscription<Object?>? _subscription;
-  String userMatricule = "m1";
+  String userMatricule = "M1"; // Voici la variable qui doit contenir la valeur du matricule garder en local
 
   Widget _buildBarcode(Barcode? value) {
     if (value == null) {
@@ -36,7 +36,7 @@ class _QrCodeScanScreenState extends State<QrCodeScanScreen>
       );
     }
     print(value.displayValue);
-    if (userMatricule == value.displayValue) {
+    if (userMatricule == value.displayValue) { // Voici ou est effectué la comparaison entre la valeur du matricule gardé en local et celle contenu dans le QR Code
       print("success");
       sessionProvider.answer_call_session(matricule: userMatricule);
       // Navigator.of(context).pushReplacementNamed(HomepageScreen.routeName);
