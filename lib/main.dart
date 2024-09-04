@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
       routes: {
         "/": (ctx) => const WelcomeScreen(),
         CreateAccountScreen.routeName: (ctx) => const CreateAccountScreen(),
-        ValidateAccountScreen.routeName: (ctx) => ValidateAccountScreen(),
+        ValidateAccountScreen.routeName: (ctx) => const ValidateAccountScreen(),
         HomepageScreen.routeName: (ctx) => const HomepageScreen(),
       },
     );

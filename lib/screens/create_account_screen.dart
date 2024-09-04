@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import './validate_account_screen.dart';
 
 import '../widgets/custom_appbar.dart';
+import '../widgets/error_dialog.dart';
+
+import '../providers/student_provider.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   static const routeName = "/create-account";
@@ -16,6 +19,31 @@ class CreateAccountScreen extends StatefulWidget {
 class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final _matriculeController = TextEditingController();
   final _scrollController = ScrollController();
+  var _isLoading = false;
+
+  void _onMatriculeSubmited() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      final student = await StudentProvider()
+          .fetchStudentByMatricule(_matriculeController.text);
+      setState(() {
+        _isLoading = false;
+      });
+      if (mounted) {
+        Navigator.of(context)
+            .pushNamed(ValidateAccountScreen.routeName, arguments: student);
+      }
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+      if (mounted) {
+        await errorDialog(context);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,17 +89,16 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     curve: Curves.linear,
                   );
                 },
-                onSubmitted: (_) {},
+                onSubmitted: (_) => _onMatriculeSubmited(),
               ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pushNamed(ValidateAccountScreen.routeName);
-                  },
-                  child: const Text('Poursuivre'),
-                ),
+                child: _isLoading
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton(
+                        onPressed: () => _onMatriculeSubmited(),
+                        child: const Text('Poursuivre'),
+                      ),
               ),
             ],
           ),

@@ -1,7 +1,9 @@
+import 'package:checkme_pro/models/student.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../providers/fingerprint_auth.dart';
+import '../providers/student_provider.dart';
 
 import '../widgets/custom_appbar.dart';
 import '../widgets/statistic_grid.dart';
@@ -13,9 +15,16 @@ class HomepageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scaffold = ScaffoldMessenger.of(context);
     final appTheme = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
     var fingerprintAuth = FingerprintAuth();
+
+    String studentmatricule =
+        ModalRoute.of(context)?.settings.arguments as String;
+
+    Future<Student> student =
+        StudentProvider().fetchStudentByMatricule(studentmatricule);
 
     return Scaffold(
       appBar: customAppBar('CheckME'),
@@ -28,26 +37,42 @@ class HomepageScreen extends StatelessWidget {
             Text('Acceuil', style: appTheme.textTheme.displayLarge),
             const Spacer(),
             // this is the container row with the user icon and the rest
-            SizedBox(
-              width: mediaQuery.size.width * 0.9,
-              child: Card(
-                margin: const EdgeInsets.all(5),
-                child: ListTile(
-                  leading: const FittedBox(
-                    fit: BoxFit.contain,
-                    child: CircleAvatar(
-                      radius: 80,
-                      backgroundImage: AssetImage('assets/images/user.png'),
-                    ),
-                  ),
-                  title: Text(
-                    'NDJESSE LETERE Emmanuel Andy',
-                    style: appTheme.textTheme.titleMedium,
-                  ),
-                  subtitle: const Text('Ingenierie des Systèmes Numériques'),
-                ),
-              ),
-            ),
+            FutureBuilder(
+                future: student,
+                builder: (ctx, dataSnapshot) {
+                  if (dataSnapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else {
+                    if (dataSnapshot.error != null) {
+                      // Do error handling stuff here
+                      return const Center(child: Text('An error occured'));
+                    } else {
+                      return SizedBox(
+                        width: mediaQuery.size.width * 0.9,
+                        child: Card(
+                          margin: const EdgeInsets.all(5),
+                          child: ListTile(
+                            leading: const FittedBox(
+                              fit: BoxFit.contain,
+                              child: CircleAvatar(
+                                radius: 80,
+                                backgroundImage:
+                                    AssetImage('assets/images/user.png'),
+                              ),
+                            ),
+                            title: Text(
+                              '${dataSnapshot.data?.firstName} ${dataSnapshot.data?.lastName}',
+                              style: appTheme.textTheme.titleMedium,
+                            ),
+                            subtitle: Text('${dataSnapshot.data?.filiere}'),
+                          ),
+                        ),
+                      );
+                    }
+                  }
+                }),
             const Spacer(),
             SizedBox(
                 width: mediaQuery.size.width * 0.8,
@@ -88,7 +113,7 @@ class HomepageScreen extends StatelessWidget {
               onTap: () async {
                 if (await fingerprintAuth.checkFingerPrint()) {
                   if (await fingerprintAuth.showFingerPrint()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    scaffold.showSnackBar(
                       const SnackBar(
                         content: Text("Authentification réussie"),
                         duration: Duration(seconds: 1),

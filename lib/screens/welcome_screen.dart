@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:checkme_pro/providers/local_file_provider.dart';
 import 'package:flutter/material.dart';
 
 import './create_account_screen.dart';
+import './homepage_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -8,6 +12,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    final navigator = Navigator.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -57,10 +62,19 @@ class WelcomeScreen extends StatelessWidget {
               const Spacer(),
               ElevatedButton(
                 child: const Text('Poursuivre'),
-                onPressed: () {
-                  Navigator.of(context).pushReplacementNamed(
-                    CreateAccountScreen.routeName,
-                  );
+                onPressed: () async {
+                  try {
+                    final readMatricule =
+                        await LocalFileProvider().readFromFile();
+                    navigator.pushReplacementNamed(HomepageScreen.routeName,
+                        arguments: readMatricule);
+                  } catch (e) {
+                    if (e is FileSystemException) {
+                      navigator.pushReplacementNamed(
+                        CreateAccountScreen.routeName,
+                      );
+                    }
+                  }
                 },
               ),
               const Spacer(),
