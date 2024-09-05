@@ -2,24 +2,30 @@ import 'package:flutter/material.dart';
 
 import './homepage_screen.dart';
 
+import '../models/student.dart';
+
+import '../providers/local_file_provider.dart';
+
 import '../widgets/custom_appbar.dart';
 
 class ValidateAccountScreen extends StatelessWidget {
   static const routeName = "/validate-account";
 
-  ValidateAccountScreen({super.key});
-
-  final _studentInfo = {
-    'Matricule': '20G60465',
-    'Filière': 'Ingénierie des systèmes numériques',
-    'Option': 'Production de palteforme numériques',
-    'Niveau': '5',
-  };
+  const ValidateAccountScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    Student? student = ModalRoute.of(context)?.settings.arguments as Student?;
     final appTheme = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
+    final navigator = Navigator.of(context);
+
+    final studentInfo = {
+      'Matricule': student!.matricule,
+      'Nom': student.firstName,
+      'Prénom': student.lastName,
+      'Filière': student.filiere,
+    };
 
     List<Widget> studentInfoTile(Map<String, String> studentInfo) {
       List<Widget> studentInfoList = [];
@@ -101,7 +107,7 @@ class ValidateAccountScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  ...studentInfoTile(_studentInfo),
+                  ...studentInfoTile(studentInfo),
                 ],
               ),
             ),
@@ -123,9 +129,11 @@ class ValidateAccountScreen extends StatelessWidget {
                     child: const Text('Annuler'),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                          HomepageScreen.routeName, ModalRoute.withName("/"));
+                    onPressed: () async {
+                      await LocalFileProvider().writeToFile(student.matricule);
+                      navigator.pushNamedAndRemoveUntil(
+                          HomepageScreen.routeName, ModalRoute.withName("/"),
+                          arguments: student.matricule);
                     },
                     child: const Text('Valider'),
                   )
