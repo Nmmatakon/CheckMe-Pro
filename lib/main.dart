@@ -4,6 +4,7 @@ import './screens/welcome_screen.dart';
 import './screens/create_account_screen.dart';
 import './screens/validate_account_screen.dart';
 import './screens/homepage_screen.dart';
+import './screens/qr_code_scan_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
         CreateAccountScreen.routeName: (ctx) => const CreateAccountScreen(),
         ValidateAccountScreen.routeName: (ctx) => const ValidateAccountScreen(),
         HomepageScreen.routeName: (ctx) => const HomepageScreen(),
+        QrCodeScanScreen.routeName: (ctx) => const QrCodeScanScreen(),
       },
     );
   }

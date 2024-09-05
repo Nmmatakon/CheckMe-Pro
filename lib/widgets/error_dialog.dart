@@ -9,7 +9,7 @@ Future errorDialog(BuildContext ctx) => showDialog(
           size: 50,
         ),
         content: const Text(
-            'Vérifiez votre connexion à internet ou votre matricule'),
+            'Erreur de communication avec le serveur. Vérifiez votre connexion Internet'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),

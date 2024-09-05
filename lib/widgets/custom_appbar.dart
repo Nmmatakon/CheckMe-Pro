@@ -1,7 +1,6 @@
-import 'package:checkme_pro/screens/qr_code_scan_screen.dart';
 import 'package:flutter/material.dart';
 
-AppBar customAppBar(String? title, BuildContext context) {
+AppBar customAppBar(String? title) {
   return AppBar(
     centerTitle: false,
     forceMaterialTransparency: true,
@@ -9,13 +8,9 @@ AppBar customAppBar(String? title, BuildContext context) {
     actions: [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20),
-        child: GestureDetector(
-          onTap: () =>
-              Navigator.of(context).push(createRoute(const QrCodeScanScreen())),
-          child: Image.asset(
-            "assets/images/empreinte.png",
-            fit: BoxFit.cover,
-          ),
+        child: Image.asset(
+          "assets/images/empreinte.png",
+          fit: BoxFit.cover,
         ),
       )
     ],

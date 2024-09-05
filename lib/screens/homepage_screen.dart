@@ -4,9 +4,13 @@ import 'package:intl/intl.dart';
 
 import '../providers/fingerprint_auth.dart';
 import '../providers/student_provider.dart';
+import '../providers/session_provider.dart';
 
 import '../widgets/custom_appbar.dart';
 import '../widgets/statistic_grid.dart';
+import '../widgets/answer_button.dart';
+
+import './qr_code_scan_screen.dart';
 
 class HomepageScreen extends StatelessWidget {
   static const routeName = "/home-page";
@@ -27,7 +31,7 @@ class HomepageScreen extends StatelessWidget {
         StudentProvider().fetchStudentByMatricule(studentmatricule);
 
     return Scaffold(
-      appBar: customAppBar('CheckME', context),
+      appBar: customAppBar('CheckME'),
       body: SizedBox(
         width: double.infinity,
         child: Column(
@@ -79,26 +83,6 @@ class HomepageScreen extends StatelessWidget {
                 child: Text(
                   DateFormat.yMMMMEEEEd().format(DateTime.now()),
                 )),
-            // Coures description is below
-            SizedBox(
-              width: mediaQuery.size.width * 0.9,
-              child: ListTile(
-                leading: const Text(
-                  "ISN5211",
-                  style: TextStyle(fontSize: 14),
-                ),
-                title: Text(
-                  'Management de l\'innovation Digitale',
-                  style: appTheme.textTheme.titleMedium,
-                ),
-                subtitle: const Text('Pr SONE MBASSI'),
-                trailing: Container(
-                  width: 20,
-                  decoration: const BoxDecoration(
-                      color: Colors.green, shape: BoxShape.circle),
-                ),
-              ),
-            ),
             const Spacer(),
             // The following is the statistic grid
             SizedBox(
@@ -108,38 +92,42 @@ class HomepageScreen extends StatelessWidget {
               child: StatisticGrid(),
             ),
             const Spacer(),
-            // this is the button to answer at roll call
-            GestureDetector(
-              onTap: () async {
-                if (await fingerprintAuth.checkFingerPrint()) {
-                  if (await fingerprintAuth.showFingerPrint()) {
-                    scaffold.showSnackBar(
-                      const SnackBar(
-                        content: Text("Authentification réussie"),
-                        duration: Duration(seconds: 1),
-                      ),
-                    );
-                  }
-                }
-              },
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: const [
-                      BoxShadow(
-                          offset: Offset.zero,
-                          blurRadius: 10,
-                          spreadRadius: 2,
-                          color: Color.fromARGB(20, 33, 149, 243)),
-                    ],
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: appTheme.colorScheme.onPrimary)),
-                height: 80,
-                child: Image.asset(
-                  'assets/images/empreinte.png',
-                  fit: BoxFit.cover,
-                ),
+            // this is the button to answer at roll call by finger print
+            SizedBox(
+              width: mediaQuery.size.width * 0.9,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnswerButton(
+                    buttonImage: 'assets/images/empreinte.png',
+                    answerCall: () async {
+                      if (await fingerprintAuth.checkFingerPrint()) {
+                        if (await fingerprintAuth.showFingerPrint()) {
+                          try {
+                            await SessionProvider()
+                                .answerCallSession(matricule: studentmatricule);
+                            scaffold.showSnackBar(
+                              const SnackBar(
+                                content: Text("Authentification réussie"),
+                                duration: Duration(seconds: 1),
+                              ),
+                            );
+                          } catch (e) {
+                            //handling error here
+                          }
+                        }
+                      }
+                    },
+                  ),
+                  const Padding(padding: EdgeInsets.symmetric(horizontal: 10)),
+                  AnswerButton(
+                      answerCall: () {
+                        Navigator.of(context).pushNamed(
+                            QrCodeScanScreen.routeName,
+                            arguments: studentmatricule);
+                      },
+                      buttonImage: 'assets/images/qrcode.png')
+                ],
               ),
             ),
             const Spacer(),
@@ -150,7 +138,7 @@ class HomepageScreen extends StatelessWidget {
               ),
             ),
             const Text(
-              'Veuillez Appuyer',
+              'Veuillez Appuyer sur un button',
               style: TextStyle(
                 color: Colors.grey,
               ),

@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-String url_base = "http://lameute.alwaysdata.net";
+String urlBase = "http://lameute.alwaysdata.net";
 
 class SessionProvider {
-  Future answer_call_session({required String matricule}) async {
+  Future answerCallSession({required String matricule}) async {
     try {
       final response = await http.put(
-        Uri.parse("$url_base/student/answer/$matricule"),
+        Uri.parse("$urlBase/student/answer/$matricule"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -16,7 +16,7 @@ class SessionProvider {
           'matricule': matricule,
         }),
       );
-      print("la response est la suivante: ${response.body}");
+      // print("la response est la suivante: ${response.body}");
       print("le statut de la reponse est la suivante: ${response.statusCode}");
       if (response.statusCode == 200) {
         print(response.body);
@@ -25,6 +25,7 @@ class SessionProvider {
       }
     } catch (e) {
       print(e);
+      rethrow;
     }
   }
 }
