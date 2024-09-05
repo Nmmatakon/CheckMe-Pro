@@ -27,7 +27,7 @@ class HomepageScreen extends StatelessWidget {
         StudentProvider().fetchStudentByMatricule(studentmatricule);
 
     return Scaffold(
-      appBar: customAppBar('CheckME'),
+      appBar: customAppBar('CheckME', context),
       body: SizedBox(
         width: double.infinity,
         child: Column(

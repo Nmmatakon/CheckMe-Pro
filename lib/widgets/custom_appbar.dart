@@ -1,6 +1,7 @@
+import 'package:checkme_pro/screens/qr_code_scan_screen.dart';
 import 'package:flutter/material.dart';
 
-AppBar customAppBar(String? title) {
+AppBar customAppBar(String? title, BuildContext context) {
   return AppBar(
     centerTitle: false,
     forceMaterialTransparency: true,
@@ -8,11 +9,34 @@ AppBar customAppBar(String? title) {
     actions: [
       Padding(
         padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20),
-        child: Image.asset(
-          "assets/images/empreinte.png",
-          fit: BoxFit.cover,
+        child: GestureDetector(
+          onTap: () =>
+              Navigator.of(context).push(createRoute(const QrCodeScanScreen())),
+          child: Image.asset(
+            "assets/images/empreinte.png",
+            fit: BoxFit.cover,
+          ),
         ),
       )
     ],
+  );
+}
+
+Route createRoute(Widget screen) {
+  return PageRouteBuilder(
+    transitionDuration: const Duration(milliseconds: 400),
+    pageBuilder: (context, animation, secondaryAnimation) => screen,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0);
+      const end = Offset.zero;
+      const curve = Curves.linear;
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
+      );
+    },
   );
 }
