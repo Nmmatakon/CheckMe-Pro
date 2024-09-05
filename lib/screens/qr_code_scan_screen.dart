@@ -27,8 +27,8 @@ class _QrCodeScanScreenState extends State<QrCodeScanScreen>
 
   Barcode? _barcode;
   StreamSubscription<Object?>? _subscription;
-  String userMatricule =
-      "M1"; // Voici la variable qui doit contenir la valeur du matricule garder en local
+  late String
+      userMatricule; // Voici la variable qui doit contenir la valeur du matricule garder en local
 
   Widget _buildBarcode(Barcode? value) {
     if (value == null) {
@@ -76,7 +76,6 @@ class _QrCodeScanScreenState extends State<QrCodeScanScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    userMatricule = ModalRoute.of(context)?.settings.arguments as String;
     if (!controller.value.isInitialized) {
       return;
     }
@@ -108,6 +107,8 @@ class _QrCodeScanScreenState extends State<QrCodeScanScreen>
 
   @override
   Widget build(BuildContext context) {
+    userMatricule = ModalRoute.of(context)?.settings.arguments as String;
+    print(userMatricule);
     return Scaffold(
       appBar: AppBar(title: const Text('CheckMe Scanner')),
       // backgroundColor: Colors.black,
