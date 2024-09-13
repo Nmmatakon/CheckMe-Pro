@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'CheckMe pro',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -26,16 +27,20 @@ class MyApp extends StatelessWidget {
         appBarTheme: const AppBarTheme(
           centerTitle: true,
         ),
-        elevatedButtonTheme: const ElevatedButtonThemeData(
-          style: ButtonStyle(
-            backgroundColor: WidgetStatePropertyAll(Colors.lightBlue),
-            foregroundColor: WidgetStatePropertyAll(Colors.white),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.lightBlue,
+            foregroundColor: Colors.white,
+            minimumSize: const Size(double.infinity, 50),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         ),
         textTheme: const TextTheme(
           displayLarge: TextStyle(
             color: Colors.lightBlue,
-            fontSize: 28,
+            fontSize: 40,
             fontWeight: FontWeight.bold,
           ),
           titleLarge: TextStyle(
@@ -50,11 +55,11 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       routes: {
-        "/": (ctx) => const WelcomeScreen(),
-        CreateAccountScreen.routeName: (ctx) => const CreateAccountScreen(),
-        ValidateAccountScreen.routeName: (ctx) => const ValidateAccountScreen(),
-        HomepageScreen.routeName: (ctx) => const HomepageScreen(),
-        QrCodeScanScreen.routeName: (ctx) => const QrCodeScanScreen(),
+        "/": (ctx) => const HomepageScreen(),
+        // CreateAccountScreen.routeName: (ctx) => const CreateAccountScreen(),
+        // ValidateAccountScreen.routeName: (ctx) => const ValidateAccountScreen(),
+        // HomepageScreen.routeName: (ctx) => const HomepageScreen(),
+        // QrCodeScanScreen.routeName: (ctx) => const QrCodeScanScreen(),
       },
     );
   }

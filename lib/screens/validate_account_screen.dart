@@ -16,131 +16,168 @@ class ValidateAccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Student? student = ModalRoute.of(context)?.settings.arguments as Student?;
+    // Student student = Student(
+    //   matricule: "20G60412",
+    //   firstName: "NDJESSE LETERE",
+    //   lastName: "Emmanuel Andy",
+    //   filiere: "Ingenierie des systèmes numériques",
+    // );
+
     final appTheme = Theme.of(context);
     final mediaQuery = MediaQuery.of(context);
     final navigator = Navigator.of(context);
 
-    final studentInfo = {
-      'Matricule': student!.matricule,
-      'Nom': student.firstName,
-      'Prénom': student.lastName,
-      'Filière': student.filiere,
-    };
-
-    List<Widget> studentInfoTile(Map<String, String> studentInfo) {
-      List<Widget> studentInfoList = [];
-      for (var i = 0; i < studentInfo.keys.toList().length; i++) {
-        studentInfoList.add(
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
+    return Scaffold(
+      appBar: customAppBar("Valider votre compte"),
+      body: Center(
+        child: SizedBox(
+          height: double.infinity,
+          width: mediaQuery.size.width * 0.9,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Spacer(),
               Text(
-                studentInfo.keys.toList()[i],
-                style: appTheme.textTheme.titleMedium,
-              ),
-              Text(
-                '  :  ',
-                style: appTheme.textTheme.titleMedium,
-              ),
-              SizedBox(
-                width: mediaQuery.size.width * 0.45,
-                child: Text(
-                  studentInfo.values.toList()[i],
-                  overflow: TextOverflow.ellipsis,
+                'Veuillez vérfier vos informations',
+                style: TextStyle(
+                  fontSize: mediaQuery.size.width * 0.05,
                 ),
-              )
+              ),
+/************************************************************************************************************* */
+              Container(
+                alignment: Alignment.center,
+                margin: EdgeInsets.only(
+                  top: mediaQuery.size.height * 0.025,
+                  bottom: 5,
+                ),
+                height: mediaQuery.size.height * 0.15,
+                child: Image.asset(
+                  'assets/images/user.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const Divider(
+                thickness: 2,
+                indent: 20,
+                endIndent: 20,
+              ),
+/*********************************************************************************************************** */
+              InfoTile(
+                title: student!.matricule,
+                subTitle: "Matricule",
+                iconData: Icons.numbers,
+              ),
+              InfoTile(
+                title: student.firstName,
+                subTitle: "Nom",
+                iconData: Icons.account_circle,
+              ),
+              InfoTile(
+                title: student.lastName,
+                subTitle: "Prénom",
+                iconData: Icons.account_circle_outlined,
+              ),
+              InfoTile(
+                title: student.filiere,
+                subTitle: "Filière",
+                iconData: Icons.app_registration_rounded,
+              ),
+/*************************************************Buttons********************************************************** */
+              Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: mediaQuery.size.height * 0.01)),
+              ElevatedButton(
+                onPressed: () async {
+                  await LocalFileProvider().writeToFile(student.matricule);
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: Container(
+                        alignment: Alignment.center,
+                        height: mediaQuery.size.height * 0.2,
+                        child: Image.asset(
+                          'assets/images/createaccount.png',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Félicitaions🎉',
+                            style: appTheme.textTheme.displayLarge,
+                          ),
+                          const Text('Votre compte est prêt à l\'emploi'),
+                        ],
+                      ),
+                      actions: [
+                        ElevatedButton(
+                            onPressed: () {
+                              navigator.pushNamedAndRemoveUntil(
+                                  HomepageScreen.routeName,
+                                  ModalRoute.withName("/"),
+                                  arguments: student.matricule);
+                            },
+                            child: const Text("Aller à l'accueil"))
+                      ],
+                    ),
+                  );
+                },
+                child: const Text('Valider'),
+              ),
+              Padding(
+                  padding: EdgeInsets.symmetric(
+                      vertical: mediaQuery.size.height * 0.01)),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: appTheme.colorScheme.onPrimary,
+                    side: BorderSide(
+                      color: appTheme.colorScheme.onPrimary,
+                    )),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Annuler'),
+              ),
             ],
           ),
-        );
-      }
-      return studentInfoList;
-    }
+        ),
+      ),
+    );
+  }
+}
 
-    return Scaffold(
-      appBar: customAppBar(null),
-      body: SizedBox(
-        height: double.infinity,
-        width: double.infinity,
-        child: Column(
-          children: [
-            Padding(
-              padding:
-                  EdgeInsets.symmetric(horizontal: mediaQuery.size.width * 0.1),
-              child: Text(
-                'Vérfiez vos informations',
-                style: appTheme.textTheme.displayLarge,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.symmetric(
-                  vertical: mediaQuery.size.height * 0.025),
-              height: mediaQuery.size.height * 0.15,
-              child: Image.asset(
-                'assets/images/user.png',
-                fit: BoxFit.cover,
-              ),
-            ),
-            Container(
-              constraints:
-                  BoxConstraints(maxWidth: mediaQuery.size.width * 0.8),
-              padding: const EdgeInsets.symmetric(
-                vertical: 8,
-                horizontal: 10,
-              ),
-              decoration: BoxDecoration(
-                color: appTheme.colorScheme.onPrimary,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                'NDJESSE LETERE Emmanuel Andy',
-                style: appTheme.textTheme.titleLarge,
-                textAlign: TextAlign.center,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            SizedBox(
-              height: (mediaQuery.size.height - AppBar().preferredSize.height) *
-                  0.3,
-              width: mediaQuery.size.width * 0.7,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ...studentInfoTile(studentInfo),
-                ],
-              ),
-            ),
-            SizedBox(
-              width: mediaQuery.size.width * 0.55,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: appTheme.colorScheme.onPrimary,
-                        side: BorderSide(
-                          color: appTheme.colorScheme.onPrimary,
-                        )),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Annuler'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await LocalFileProvider().writeToFile(student.matricule);
-                      navigator.pushNamedAndRemoveUntil(
-                          HomepageScreen.routeName, ModalRoute.withName("/"),
-                          arguments: student.matricule);
-                    },
-                    child: const Text('Valider'),
-                  )
-                ],
-              ),
-            )
-          ],
+class InfoTile extends StatelessWidget {
+  const InfoTile({
+    super.key,
+    required this.title,
+    required this.subTitle,
+    required this.iconData,
+  });
+
+  final String title;
+  final String subTitle;
+  final IconData iconData;
+
+  @override
+  Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    return ListTile(
+      leading: CircleAvatar(
+        child: Icon(
+          iconData,
+          size: mediaQuery.size.height * 0.04,
+        ),
+      ),
+      title: Text(
+        title,
+      ),
+      subtitle: Text(
+        subTitle,
+        style: const TextStyle(
+          fontStyle: FontStyle.italic,
+          color: Colors.grey,
         ),
       ),
     );

@@ -9,28 +9,33 @@ class StatisticGrid extends StatelessWidget {
 
   final List<StatisticModel> statList = [
     StatisticModel(
-        icon: Icons.warning_amber,
-        title: "Avertissement",
-        value: "1",
-        color: Colors.orange),
+      icon: Icons.warning_amber,
+      title: "Avertissement",
+      value: "1",
+    ),
     StatisticModel(
-        icon: Icons.task_alt,
-        title: "Présences",
-        value: "5",
-        color: Colors.lightGreen),
+      icon: Icons.task_alt,
+      title: "Présences",
+      value: "5",
+    ),
     StatisticModel(
-        icon: Icons.cancel_outlined,
-        title: "Absences",
-        value: "2",
-        color: Colors.red),
+      icon: Icons.cancel_outlined,
+      title: "Absences",
+      value: "2",
+    ),
+    StatisticModel(
+      icon: Icons.cancel_outlined,
+      title: "Total",
+      value: "3",
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
     return GridView(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        childAspectRatio: 1,
+        crossAxisCount: 2,
+        childAspectRatio: 3 / 2,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
       ),

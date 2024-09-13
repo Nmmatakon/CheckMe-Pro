@@ -24,132 +24,165 @@ class HomepageScreen extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
     var fingerprintAuth = FingerprintAuth();
 
-    String studentmatricule =
-        ModalRoute.of(context)?.settings.arguments as String;
+    // String studentmatricule =
+    //     ModalRoute.of(context)?.settings.arguments as String;
+    Student student = Student(
+      matricule: "20G60412",
+      firstName: "NDJESSE LETERE",
+      lastName: "Emmanuel Andy",
+      filiere: "Ingenierie des systèmes numériques",
+    );
 
-    Future<Student> student =
-        StudentProvider().fetchStudentByMatricule(studentmatricule);
+    // Future<Student> student =
+    //     StudentProvider().fetchStudentByMatricule(student.matricule);
 
     return Scaffold(
       appBar: customAppBar('CheckME'),
-      body: SizedBox(
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text('Acceuil', style: appTheme.textTheme.displayLarge),
-            const Spacer(),
-            // this is the container row with the user icon and the rest
-            FutureBuilder(
-                future: student,
-                builder: (ctx, dataSnapshot) {
-                  if (dataSnapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else {
-                    if (dataSnapshot.error != null) {
-                      // Do error handling stuff here
-                      return const Center(child: Text('An error occured'));
-                    } else {
-                      return SizedBox(
-                        width: mediaQuery.size.width * 0.9,
-                        child: Card(
-                          margin: const EdgeInsets.all(5),
-                          child: ListTile(
-                            leading: const FittedBox(
-                              fit: BoxFit.contain,
-                              child: CircleAvatar(
-                                radius: 80,
-                                backgroundImage:
-                                    AssetImage('assets/images/user.png'),
-                              ),
-                            ),
-                            title: Text(
-                              '${dataSnapshot.data?.firstName} ${dataSnapshot.data?.lastName}',
-                              style: appTheme.textTheme.titleMedium,
-                            ),
-                            subtitle: Text('${dataSnapshot.data?.filiere}'),
-                          ),
-                        ),
-                      );
-                    }
-                  }
-                }),
-            const Spacer(),
-            SizedBox(
-                width: mediaQuery.size.width * 0.8,
+      body: Center(
+        child: SizedBox(
+          width: mediaQuery.size.width * 0.9,
+          child: Column(
+            children: [
+              // this is the container row with the user icon and the rest
+              ListTile(
+                leading: const FittedBox(
+                  fit: BoxFit.contain,
+                  child: CircleAvatar(
+                    radius: 80,
+                    backgroundImage: AssetImage('assets/images/user.png'),
+                  ),
+                ),
+                title: Text(
+                  '${student.firstName} ${student.lastName}',
+                  style: appTheme.textTheme.titleMedium,
+                ),
+                subtitle: Text(student.filiere),
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 10),
+                width: double.infinity,
                 child: Text(
                   DateFormat.yMMMMEEEEd().format(DateTime.now()),
-                )),
-            const Spacer(),
-            // The following is the statistic grid
-            SizedBox(
-              height: (mediaQuery.size.height - AppBar().preferredSize.height) *
-                  0.15,
-              width: mediaQuery.size.width * 0.9,
-              child: StatisticGrid(),
-            ),
-            const Spacer(),
-            // this is the button to answer at roll call by finger print
-            SizedBox(
-              width: mediaQuery.size.width * 0.9,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnswerButton(
-                    buttonImage: 'assets/images/empreinte.png',
-                    answerCall: () async {
-                      if (await fingerprintAuth.checkFingerPrint()) {
-                        if (await fingerprintAuth.showFingerPrint()) {
-                          try {
-                            await SessionProvider()
-                                .answerCallSession(matricule: studentmatricule);
-                            scaffold.showSnackBar(
-                              const SnackBar(
-                                content: Text("Authentification réussie"),
-                                duration: Duration(seconds: 1),
-                              ),
-                            );
-                          } catch (e) {
-                            //handling error here
+                  textAlign: TextAlign.end,
+                ),
+              ),
+/*********************************The following is the statistic grid*********************************************/
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.only(bottom: 10),
+                child: const Text(
+                  "Participation d'aujourd'hui",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.start,
+                ),
+              ),
+              SizedBox(
+                height:
+                    (mediaQuery.size.height - AppBar().preferredSize.height) *
+                        0.33,
+                width: mediaQuery.size.width * 0.9,
+                child: StatisticGrid(),
+              ),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.only(bottom: 10),
+                child: const Text(
+                  "Votre Activité",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.start,
+                ),
+              ),
+/***************************************************************************************************************** */
+              Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12)),
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color:
+                            appTheme.colorScheme.onPrimary.withOpacity(0.15)),
+                    child: Icon(
+                      Icons.next_plan_outlined,
+                      color: appTheme.colorScheme.onPrimary,
+                    ),
+                  ),
+                  title: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [Text("Check In"), Text("10:00 am")],
+                  ),
+                  subtitle: const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [Text("Apr 17 2023"), Text("on Time")],
+                  ),
+                ),
+              ),
+              const Spacer(),
+/************************************************************************************************************** */
+              SizedBox(
+                width: mediaQuery.size.width * 0.9,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnswerButton(
+                      buttonImage: 'assets/images/empreinte.png',
+                      answerCall: () async {
+                        if (await fingerprintAuth.checkFingerPrint()) {
+                          if (await fingerprintAuth.showFingerPrint()) {
+                            try {
+                              await SessionProvider().answerCallSession(
+                                  matricule: student.matricule);
+                              scaffold.showSnackBar(
+                                const SnackBar(
+                                  content: Text("Authentification réussie"),
+                                  duration: Duration(seconds: 1),
+                                ),
+                              );
+                            } catch (e) {
+                              //handling error here
+                            }
                           }
                         }
-                      }
-                    },
-                  ),
-                  const Padding(padding: EdgeInsets.symmetric(horizontal: 10)),
-                  AnswerButton(
-                      answerCall: () {
-                        Navigator.of(context).pushNamed(
-                            QrCodeScanScreen.routeName,
-                            arguments: studentmatricule);
                       },
-                      buttonImage: 'assets/images/qrcode.png')
-                ],
+                    ),
+                    const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10)),
+                    AnswerButton(
+                        answerCall: () {
+                          Navigator.of(context).pushNamed(
+                              QrCodeScanScreen.routeName,
+                              arguments: student.matricule);
+                        },
+                        buttonImage: 'assets/images/qrcode.png')
+                  ],
+                ),
               ),
-            ),
-            const Spacer(),
-            Text(
-              'Répondre à l\'appel',
-              style: TextStyle(
-                color: appTheme.colorScheme.onPrimary,
+              const Spacer(),
+/******************************************************************************************************************* */
+              Text(
+                'Répondre à l\'appel',
+                style: TextStyle(
+                  color: appTheme.colorScheme.onPrimary,
+                ),
               ),
-            ),
-            const Text(
-              'Veuillez Appuyer sur un button',
-              style: TextStyle(
-                color: Colors.grey,
+              const Text(
+                'Veuillez Appuyer sur un button',
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
               ),
-            ),
-            // Last text
-            const Spacer(),
-            const Text(
-              '@uiecc2024',
-              style: TextStyle(fontSize: 10, color: Colors.grey),
-            ),
-          ],
+              // Last text
+              const Spacer(),
+              const Text(
+                '@uiecc2024',
+                style: TextStyle(fontSize: 10, color: Colors.grey),
+              ),
+            ],
+          ),
         ),
       ),
     );
