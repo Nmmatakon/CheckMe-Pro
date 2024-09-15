@@ -41,6 +41,7 @@ class WelcomeScreen extends StatelessWidget {
               const Text(
                 'Check',
                 style: TextStyle(
+                  fontWeight: FontWeight.bold,
                   fontSize: 50,
                   color: Color.fromARGB(221, 52, 50, 50),
                 ),
@@ -60,22 +61,25 @@ class WelcomeScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 15, color: Colors.grey),
               ),
               const Spacer(),
-              ElevatedButton(
-                child: const Text('Poursuivre'),
-                onPressed: () async {
-                  try {
-                    final readMatricule =
-                        await LocalFileProvider().readFromFile();
-                    navigator.pushReplacementNamed(HomepageScreen.routeName,
-                        arguments: readMatricule);
-                  } catch (e) {
-                    if (e is FileSystemException) {
-                      navigator.pushReplacementNamed(
-                        CreateAccountScreen.routeName,
-                      );
+              SizedBox(
+                width: mediaQuery.size.width * 0.8,
+                child: ElevatedButton(
+                  child: const Text('Poursuivre'),
+                  onPressed: () async {
+                    try {
+                      final readMatricule =
+                          await LocalFileProvider().readFromFile();
+                      navigator.pushReplacementNamed(HomepageScreen.routeName,
+                          arguments: readMatricule);
+                    } catch (e) {
+                      if (e is FileSystemException) {
+                        navigator.pushReplacementNamed(
+                          CreateAccountScreen.routeName,
+                        );
+                      }
                     }
-                  }
-                },
+                  },
+                ),
               ),
               const Spacer(),
               const Text(

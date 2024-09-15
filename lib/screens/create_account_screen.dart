@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import './validate_account_screen.dart';
 
@@ -26,21 +27,21 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       setState(() {
         _isLoading = true;
       });
-      final student = await StudentProvider()
-          .fetchStudentByMatricule(_matriculeController.text);
+      final student = Provider.of<StudentProvider>(context, listen: false);
+      await student.fetchStudentByMatricule(_matriculeController.text);
       setState(() {
         _isLoading = false;
       });
       if (mounted) {
-        Navigator.of(context)
-            .pushNamed(ValidateAccountScreen.routeName, arguments: student);
+        Navigator.of(context).pushNamed(ValidateAccountScreen.routeName,
+            arguments: student.student);
       }
     } catch (error) {
       setState(() {
         _isLoading = false;
       });
       if (mounted) {
-        await errorDialog(context);
+        await errorDialog(context, error.toString());
       }
     }
   }
@@ -51,56 +52,89 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     final mediaQuery = MediaQuery.of(context);
 
     return Scaffold(
-      appBar: customAppBar(null),
-      body: SizedBox(
-        height: double.infinity,
-        width: double.infinity,
-        child: SingleChildScrollView(
-          controller: _scrollController,
-          child: Column(
-            children: [
-              Text(
-                'Créer un Compte',
-                style: appTheme.textTheme.displayLarge,
-              ),
-              Container(
-                margin: EdgeInsets.symmetric(
-                    vertical: mediaQuery.size.height * 0.05),
-                height: mediaQuery.size.height * 0.3,
-                child: Image.asset(
-                  'assets/images/createaccount.png',
-                  fit: BoxFit.cover,
+      appBar: customAppBar("Créer un Compte"),
+      body: Center(
+        child: SizedBox(
+          height: double.infinity,
+          width: mediaQuery.size.width * 0.9,
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  alignment: Alignment.center,
+                  margin: EdgeInsets.symmetric(
+                      vertical: mediaQuery.size.height * 0.05),
+                  height: mediaQuery.size.height * 0.2,
+                  child: Image.asset(
+                    'assets/images/createaccount.png',
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              TextField(
-                maxLength: 8,
-                textInputAction: TextInputAction.done,
-                decoration: InputDecoration(
-                  constraints:
-                      BoxConstraints(maxWidth: mediaQuery.size.width * 0.8),
-                  labelText: 'Veuillez saisir votre matricule',
-                  //errorText: 'Wrong matricule',
+                Text(
+                  'Bienvenue 👋🏾',
+                  style: TextStyle(
+                      fontSize: mediaQuery.size.width * 0.13,
+                      fontWeight: FontWeight.bold),
                 ),
-                controller: _matriculeController,
-                onChanged: (_) {
-                  _scrollController.animateTo(
-                    _scrollController.position.maxScrollExtent,
-                    duration: const Duration(milliseconds: 1),
-                    curve: Curves.linear,
-                  );
-                },
-                onSubmitted: (_) => _onMatriculeSubmited(),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: _isLoading
-                    ? const CircularProgressIndicator()
-                    : ElevatedButton(
-                        onPressed: () => _onMatriculeSubmited(),
-                        child: const Text('Poursuivre'),
+                Row(children: [
+                  Text(
+                    "Dans ",
+                    style: TextStyle(
+                        fontSize: mediaQuery.size.width * 0.1,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Check Me',
+                    style: appTheme.textTheme.displayLarge,
+                  )
+                ]),
+                const Text(
+                  'Veuillez vous enregistrer pour continuer',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                SizedBox(
+                  height: mediaQuery.size.height * 0.03,
+                ),
+                TextField(
+                  maxLength: 8,
+                  textInputAction: TextInputAction.done,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: appTheme.colorScheme.onPrimary,
+                        width: 2.0,
+                        style: BorderStyle.solid, // Add border radius here
                       ),
-              ),
-            ],
+                    ),
+                    labelText: 'Veuillez saisir votre matricule',
+                    //errorText: 'Wrong matricule',
+                  ),
+                  controller: _matriculeController,
+                  onChanged: (_) {
+                    _scrollController.animateTo(
+                      _scrollController.position.maxScrollExtent,
+                      duration: const Duration(milliseconds: 1),
+                      curve: Curves.linear,
+                    );
+                  },
+                  onSubmitted: (_) => _onMatriculeSubmited(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10, top: 5),
+                  child: _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ElevatedButton(
+                          onPressed: () => _onMatriculeSubmited(),
+                          child: const Text(
+                            'Continuer',
+                          ),
+                        ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
