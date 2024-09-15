@@ -1,30 +1,52 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-String urlBase = "http://lameute.alwaysdata.net";
+import '../models/session.dart';
 
-class SessionProvider {
-  Future answerCallSession({required String matricule}) async {
+class SessionProvider with ChangeNotifier {
+  static String hostIp = "192.168.1.170";
+  static int hostPort = 9000;
+
+  late Session session;
+
+  Future<void> answerCallSession({required String matricule}) async {
+    var url = Uri(
+      scheme: "http",
+      host: hostIp,
+      port: hostPort,
+      path: "/student/answer/$matricule",
+    );
     try {
-      final response = await http.put(
-        Uri.parse("$urlBase/student/answer/$matricule"),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'matricule': matricule,
-        }),
-      );
-      // print("la response est la suivante: ${response.body}");
-      print("le statut de la reponse est la suivante: ${response.statusCode}");
-      if (response.statusCode == 200) {
-        print(response.body);
-      } else {
-        throw Exception('Failed to communicate with server');
-      }
+      await http.put(url);
     } catch (e) {
-      print(e);
+      rethrow;
+    }
+  }
+
+  Future<void> getSession(String matricule) async {
+    var url = Uri(
+      scheme: "http",
+      host: hostIp,
+      port: hostPort,
+      path: "/student/session/active/$matricule",
+    );
+    try {
+      final response = await http.get(url);
+      final sessionresponse = jsonDecode(response.body) as Map<String, dynamic>;
+      final actualSession = Session(
+        codeUE: sessionresponse['subject']['codeUE'],
+        title: sessionresponse['subject']['name'],
+        teacher: sessionresponse['subject']['teacher'],
+        startTime: sessionresponse['startTime'],
+        endTime: sessionresponse['endTime'],
+        numberOfSession: sessionresponse['numberOfSession'],
+        active: sessionresponse['active'],
+        sessionStatus: sessionresponse['sessionStatus'],
+      );
+      session = actualSession;
+    } catch (e) {
       rethrow;
     }
   }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Future errorDialog(BuildContext ctx) => showDialog(
+Future errorDialog(BuildContext ctx, String message) => showDialog(
       context: ctx,
       builder: (ctx) => AlertDialog(
         title: const Icon(
@@ -8,8 +8,7 @@ Future errorDialog(BuildContext ctx) => showDialog(
           color: Colors.red,
           size: 50,
         ),
-        content: const Text(
-            'Erreur de communication avec le serveur. Vérifiez votre connexion Internet'),
+        content: Text(message),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import './validate_account_screen.dart';
 
@@ -26,21 +27,21 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       setState(() {
         _isLoading = true;
       });
-      final student = await StudentProvider()
-          .fetchStudentByMatricule(_matriculeController.text);
+      final student = Provider.of<StudentProvider>(context, listen: false);
+      await student.fetchStudentByMatricule(_matriculeController.text);
       setState(() {
         _isLoading = false;
       });
       if (mounted) {
-        Navigator.of(context)
-            .pushNamed(ValidateAccountScreen.routeName, arguments: student);
+        Navigator.of(context).pushNamed(ValidateAccountScreen.routeName,
+            arguments: student.student);
       }
     } catch (error) {
       setState(() {
         _isLoading = false;
       });
       if (mounted) {
-        await errorDialog(context);
+        await errorDialog(context, error.toString());
       }
     }
   }
@@ -124,7 +125,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10, top: 5),
                   child: _isLoading
-                      ? const CircularProgressIndicator()
+                      ? const Center(child: CircularProgressIndicator())
                       : ElevatedButton(
                           onPressed: () => _onMatriculeSubmited(),
                           child: const Text(

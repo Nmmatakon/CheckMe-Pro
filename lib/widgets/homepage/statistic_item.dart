@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/statistic_model.dart';
+import '../../models/statistic_model.dart';
 
 class StatisticItem extends StatelessWidget {
   const StatisticItem({super.key, required this.stat});
@@ -32,21 +32,21 @@ class StatisticItem extends StatelessWidget {
                           color:
                               appTheme.colorScheme.onPrimary.withOpacity(0.15)),
                       child: Icon(
-                        Icons.next_plan_outlined,
+                        stat.icon,
                         color: appTheme.colorScheme.onPrimary,
                       ),
                     ),
-                    const Text(" Check In"),
+                    Text("  ${stat.title}"),
                   ],
                 ),
                 Text(
-                  "10:20 am",
+                  stat.time,
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: mediaQuery.size.width * 0.05),
                 ),
-                const Text(
-                  "On Time",
+                Text(
+                  stat.status,
                 )
               ],
             )),
