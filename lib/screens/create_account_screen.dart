@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import './validate_account_screen.dart';
 
 import '../widgets/custom_appbar.dart';
-import '../widgets/error_dialog.dart';
+import '../widgets/qrcodepage/error_dialog.dart';
 
 import '../providers/student_provider.dart';
 

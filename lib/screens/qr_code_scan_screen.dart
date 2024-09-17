@@ -1,140 +1,81 @@
-import 'dart:async';
 
-import 'package:checkme_pro/providers/session_provider.dart';
-import 'package:checkme_pro/screens/homepage_screen.dart';
-import 'package:checkme_pro/widgets/scan_error_widget.dart';
-import 'package:checkme_pro/widgets/sccanner_buttons_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+
+import '../widgets/qrcodepage/scan_error_widget.dart';
+import '../widgets/qrcodepage/scan_label_widget.dart';
+import '../widgets/qrcodepage/sccanner_buttons_widget.dart';
 
 class QrCodeScanScreen extends StatefulWidget {
   static const routeName = "/qrCodeScanScreen";
 
   const QrCodeScanScreen({super.key});
-
   @override
-  State<QrCodeScanScreen> createState() => _QrCodeScanScreenState();
+  _QrCodeScanScreenState createState() => _QrCodeScanScreenState();
 }
 
-class _QrCodeScanScreenState extends State<QrCodeScanScreen>
-    with WidgetsBindingObserver {
-  final MobileScannerController controller = MobileScannerController(
-    autoStart: false,
-    torchEnabled: false,
-    useNewCameraSelector: true,
-  );
-  SessionProvider sessionProvider = SessionProvider();
-
-  Barcode? _barcode;
-  StreamSubscription<Object?>? _subscription;
-  late String
-      userMatricule; // Voici la variable qui doit contenir la valeur du matricule garder en local
-
-  Widget _buildBarcode(Barcode? value) {
-    if (value == null) {
-      return const Text(
-        'Scanning in progress...',
-        overflow: TextOverflow.fade,
-        style: TextStyle(color: Colors.white),
-      );
-    }
-    print(value.displayValue);
-    if (userMatricule == value.displayValue) {
-      // Voici ou est effectué la comparaison entre la valeur du matricule gardé en local et celle contenu dans le QR Code
-      print("success");
-      sessionProvider.answerCallSession(matricule: userMatricule);
-      // Navigator.of(context).pushReplacementNamed(HomepageScreen.routeName);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed(HomepageScreen.routeName);
-      });
-    }
-    return const Text(
-      // value.displayValue ?? 'No display value.',
-      "Scan performs",
-      overflow: TextOverflow.fade,
-      style: TextStyle(color: Colors.white),
-    );
-  }
-
-  void _handleBarcode(BarcodeCapture barcodes) {
-    if (mounted) {
-      setState(() {
-        _barcode = barcodes.barcodes.firstOrNull;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-
-    _subscription = controller.barcodes.listen(_handleBarcode);
-
-    unawaited(controller.start());
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (!controller.value.isInitialized) {
-      return;
-    }
-
-    switch (state) {
-      case AppLifecycleState.detached:
-      case AppLifecycleState.hidden:
-      case AppLifecycleState.paused:
-        return;
-      case AppLifecycleState.resumed:
-        _subscription = controller.barcodes.listen(_handleBarcode);
-
-        unawaited(controller.start());
-      case AppLifecycleState.inactive:
-        unawaited(_subscription?.cancel());
-        _subscription = null;
-        unawaited(controller.stop());
-    }
-  }
-
-  @override
-  Future<void> dispose() async {
-    WidgetsBinding.instance.removeObserver(this);
-    unawaited(_subscription?.cancel());
-    _subscription = null;
-    super.dispose();
-    await controller.dispose();
-  }
-
+class _QrCodeScanScreenState extends State<QrCodeScanScreen> {
   @override
   Widget build(BuildContext context) {
-    userMatricule = ModalRoute.of(context)?.settings.arguments as String;
-    print(userMatricule);
+    final MobileScannerController controller = MobileScannerController(
+      formats: const [BarcodeFormat.qrCode],
+      cameraResolution: Size(MediaQuery.of(context).size.width,
+          MediaQuery.of(context).size.height),
+    );
+    final scanWindow = Rect.fromCenter(
+      center: MediaQuery.sizeOf(context).center(Offset.zero),
+      width: 200,
+      height: 200,
+    );
+
     return Scaffold(
-      appBar: AppBar(title: const Text('CheckMe Scanner')),
-      // backgroundColor: Colors.black,
+      backgroundColor: Colors.black.withOpacity(0.1),
+      appBar: AppBar(
+        title: const Text('CheckScanner'),
+      ),
       body: Stack(
+        fit: StackFit.expand,
         children: [
           MobileScanner(
+            fit: BoxFit.contain,
             controller: controller,
+            scanWindow: scanWindow,
             errorBuilder: (context, error, child) {
               return ScannerErrorWidget(error: error);
             },
-            fit: BoxFit.contain,
+            overlayBuilder: (context, constraints) {
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ScannedBarcodeLabel(barcodes: controller.barcodes),
+                ),
+              );
+            },
+          ),
+          ValueListenableBuilder(
+            valueListenable: controller,
+            builder: (context, value, child) {
+              if (!value.isInitialized ||
+                  !value.isRunning ||
+                  value.error != null) {
+                return const SizedBox();
+              }
+
+              return CustomPaint(
+                painter: ScannerOverlay(scanWindow: scanWindow),
+              );
+            },
           ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              alignment: Alignment.bottomCenter,
-              height: 100,
-              color: Colors.black.withOpacity(0.4),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   ToggleFlashlightButton(controller: controller),
-                  // StartStopMobileScannerButton(controller: controller),
-                  _buildBarcode(_barcode),
                   SwitchCameraButton(controller: controller),
-                  // AnalyzeImageFromGalleryButton(controller: controller),
                 ],
               ),
             ),
@@ -142,5 +83,74 @@ class _QrCodeScanScreenState extends State<QrCodeScanScreen>
         ],
       ),
     );
+  }
+
+  // @override
+  // Future<void> dispose() async {
+  //   super.dispose();
+  //   await controller.dispose();
+  // }
+}
+
+class ScannerOverlay extends CustomPainter {
+  const ScannerOverlay({
+    required this.scanWindow,
+    this.borderRadius = 12.0,
+  });
+
+  final Rect scanWindow;
+  final double borderRadius;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // we need to pass the size to the custom paint widget
+    final backgroundPath = Path()..addRect(Rect.largest);
+
+    final cutoutPath = Path()
+      ..addRRect(
+        RRect.fromRectAndCorners(
+          scanWindow,
+          topLeft: Radius.circular(borderRadius),
+          topRight: Radius.circular(borderRadius),
+          bottomLeft: Radius.circular(borderRadius),
+          bottomRight: Radius.circular(borderRadius),
+        ),
+      );
+
+    final backgroundPaint = Paint()
+      ..color = Colors.black.withOpacity(0.5)
+      ..style = PaintingStyle.fill
+      ..blendMode = BlendMode.dstOut;
+
+    final backgroundWithCutout = Path.combine(
+      PathOperation.difference,
+      backgroundPath,
+      cutoutPath,
+    );
+
+    final borderPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 4.0;
+
+    final borderRect = RRect.fromRectAndCorners(
+      scanWindow,
+      topLeft: Radius.circular(borderRadius),
+      topRight: Radius.circular(borderRadius),
+      bottomLeft: Radius.circular(borderRadius),
+      bottomRight: Radius.circular(borderRadius),
+    );
+
+    // First, draw the background,
+    // with a cutout area that is a bit larger than the scan window.
+    // Finally, draw the scan window itself.
+    canvas.drawPath(backgroundWithCutout, backgroundPaint);
+    canvas.drawRRect(borderRect, borderPaint);
+  }
+
+  @override
+  bool shouldRepaint(ScannerOverlay oldDelegate) {
+    return scanWindow != oldDelegate.scanWindow ||
+        borderRadius != oldDelegate.borderRadius;
   }
 }
